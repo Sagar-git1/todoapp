@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo app</title>
+  </head>
+  <body>
+    <label for="taskname">Task name</label>
+    <input type="text" id="taskname" name="taskname" /> <br />
+    <br />
+    <label for="taskdescrip">Task description</label>
+    <input type="text" id="taskdescrip" name="taskdescrip" /><br />
+    <button onclick="handlerequest()">submit</button>
+    <div id="maincontent"></div>
+  </body>
+  <script>
+    function deletionStatus() {
+      console.log("deletion completed");
+    }
+    function deleteTodo(id) {
+      console.log(id);
+      fetch("http://localhost:3000/todos/" + id, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "appplication/json",
+        },
+      }).then(deletionStatus);
+    }
+    function gettodoData(data) {
+      var parentElement = document.getElementById("maincontent");
+      //parentElement.innerHTML = JSON.stringify(data);
+      for (var i = 0; i < data.length; i++) {
+        var childElement = document.createElement("div");
+        var grandChildElement1 = document.createElement("span");
+        grandChildElement1.innerHTML = data[i].title;
+        var grandChildElement2 = document.createElement("span");
+        grandChildElement2.innerHTML = data[i].description;
+        var grandChildElement3 = document.createElement("button");
+        grandChildElement3.innerHTML = "Delete";
+        grandChildElement3.setAttribute(
+          "onClick",
+          "deleteTodo(" + data[i].id + ")"
+        );
+        childElement.appendChild(grandChildElement1);
+        childElement.appendChild(grandChildElement2);
+        childElement.appendChild(grandChildElement3);
+        //childElement.innerHTML = data[i].title;
+        parentElement.appendChild(childElement);
+      }
+    }
+    function callback2(response) {
+      response.json().then(gettodoData);
+    }
+    function getData() {
+      fetch("http://localhost:3000/todos", {
+        method: "GET",
+      }).then(callback2);
+    }
+
+    getData();
+
+    function parseData(data) {
+      console.log(data);
+      var parentElement = document.getElementById("maincontent");
+      var childElement = document.createElement("div");
+      var grandChildElement1 = document.createElement("span");
+      grandChildElement1.innerHTML = data.title;
+      var grandChildElement2 = document.createElement("span");
+      grandChildElement2.innerHTML = data.description;
+      var grandChildElement3 = document.createElement("button");
+      grandChildElement3.innerHTML = "Delete";
+      childElement.appendChild(grandChildElement1);
+      childElement.appendChild(grandChildElement2);
+      childElement.appendChild(grandChildElement3);
+      //childElement.innerHTML = data[i].title;
+      parentElement.appendChild(childElement);
+    }
+    function callback(response) {
+      response.json().then(parseData);
+    }
+    function handlerequest() {
+      var title = document.getElementById("taskname").value;
+      var description = document.getElementById("taskdescrip").value;
+      console.log(title, description);
+      fetch("http://localhost:3000/todos", {
+        method: "POST",
+        body: JSON.stringify({
+          title: title,
+          description: description,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then(callback);
+    }
+  </script>
+</html>
